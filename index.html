@@ -11,7 +11,7 @@ body{
   font-family: "Segoe UI", Arial, sans-serif;
   background:#080b12;
   color:white;
-  padding:90px 12px 100px;
+  padding:90px 12px 110px;
 }
 
 /* USER BOX */
@@ -74,7 +74,7 @@ body{
   justify-content:center;
   align-items:center;
   backdrop-filter: blur(6px);
-  z-index:9999999;
+  z-index:99999999;
 }
 
 .popup-box{
@@ -110,134 +110,8 @@ body{
   from{transform:scale(.7);opacity:0;}
   to{transform:scale(1);opacity:1;}
 }
-</style>
-</head>
-<body>
 
-<div class="user-box">
-  <div><b>User:</b> <span id="username">-</span></div>
-  <div><b>Balance:</b> ₹<span id="balance">0</span></div>
-</div>
-
-<div class="matches-area" id="matchContainer"></div>
-<p class="upcoming">8th Match starts in <b>3 Hours</b> ⏳</p>
-
-<!-- Custom Popup -->
-<div class="popup-overlay" id="popup">
-  <div class="popup-box">
-    <h2 id="popupTitle">Title</h2>
-    <p id="popupMsg">Message</p>
-    <button class="popup-btn" onclick="closePopup()">OK</button>
-  </div>
-</div>
-
-<script>
-// MATCH DATA
-const matches = [
-  ["Delhi (Black)", "Kolkata (Blue)"],
-  ["Mumbai (Black)", "Punjab (Blue)"],
-  ["Hyderabad (Black)", "Chennai (Blue)"],
-  ["Lucknow (Black)", "Gujarat (Blue)"],
-  ["Bangalore (Black)", "Rajasthan (Blue)"],
-  ["Goa (Black)", "Kerala (Blue)"],
-  ["Nagpur (Black)", "Pune (Blue)"],
-];
-
-// POPUP FUNCTION
-function pop(title, msg){
-  document.getElementById("popupTitle").innerText = title;
-  document.getElementById("popupMsg").innerText = msg;
-  document.getElementById("popup").style.display = "flex";
-}
-function closePopup(){
-  document.getElementById("popup").style.display = "none";
-}
-
-// USER & BALANCE SETUP
-function initUser(){
-  const hash = window.location.hash.replace("#","");
-  if(hash.includes("#")){
-     const [name, bal] = hash.split("#");
-     if(name && !isNaN(bal)){
-        localStorage.setItem("bet_username", name);
-        localStorage.setItem("bet_balance", Number(bal));
-     }
-     history.replaceState(null,null,window.location.pathname);
-  }
-  loadUser();
-}
-
-function loadUser(){
-  document.getElementById("username").innerText = localStorage.getItem("bet_username") || "Guest";
-  document.getElementById("balance").innerText = localStorage.getItem("bet_balance") || 0;
-}
-
-function updateBalance(amount){
-  localStorage.setItem("bet_balance", amount);
-  document.getElementById("balance").innerText = amount;
-}
-
-// BET SYSTEM
-function bet(option){
-  let bal = Number(localStorage.getItem("bet_balance") || 0);
-
-  if(bal < 200){
-     pop("Low Balance ⚠", "You need at least ₹200 to place a bet. Redirecting to Withdrawl.");
-     setTimeout(()=>location.href="/deposit",1400);
-     return;
-  }
-
-  bal -= 200;
-  updateBalance(bal);
-  pop("Bet Placed 🎉", `You placed bet on:\n${option}\n\nNew Balance: ₹${bal}`);
-
-  const u = document.getElementById("username").innerText;
-  setTimeout(()=>location.href=`/home#${u}#${bal}`,1200);
-}
-
-// RENDER MATCH CARDS
-function renderMatches(){
-  const box = document.getElementById("matchContainer");
-  matches.forEach(m=>{
-     let div = document.createElement("div");
-     div.className = "match-card";
-     div.innerHTML = `
-       <h3>${m[0].split(" ")[0]} vs ${m[1].split(" ")[0]}</h3>
-       <div class="btns">
-         <button class="btn black" onclick="bet('${m[0]}')">Bet 200 Black</button>
-         <button class="btn blue" onclick="bet('${m[1]}')">Bet 200 Blue</button>
-       </div>
-     `;
-     box.appendChild(div);
-  });
-}
-
-// INIT
-initUser();
-renderMatches();
-</script>
-</body>
-</html>
-
-
-
-
-
-<!-- Floating Top Bar -->
-<div class="killer-top-bar">
-  <div class="brand-box">
-    <img src="https://d13ir53smqqeyp.cloudfront.net/d11-static-pages/images/dream11LogoWhite.webp" class="brand-img">
-    <span class="pro-badge">PRO</span>
-  </div>
-
-  <!-- Username center -->
-  <span id="userName" class="user-name"></span>
-
-  <!-- Wallet right -->
-  <button id="walletBtn" class="wallet-btn">₹0</button>
-</div>
-
-<style>
+/* TOP BAR */
 .killer-top-bar{
   position: fixed;top: 14px;left: 50%;transform: translateX(-50%);
   width: calc(100% - 32px);max-width: 760px;height: 62px;
@@ -251,43 +125,137 @@ renderMatches();
 .brand-box{display: flex;align-items:center;gap:8px;}
 .brand-img{width:115px;filter: drop-shadow(0 0 10px rgba(255,255,255,0.4));}
 .pro-badge{background:linear-gradient(90deg,#ff006a,#ff7e00);padding:3px 10px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;}
-.user-name{position:absolute;left:70%;transform:translateX(-50%);font-size:15px;font-weight:700;color:#fff;text-transform:capitalize;}
+.user-name{position:absolute;left:50%;transform:translateX(-50%);font-size:15px;font-weight:700;color:#fff;text-transform:capitalize;}
 .wallet-btn{
   background:linear-gradient(90deg,rgba(0,255,209,0.22),rgba(122,95,255,0.22));
   padding:8px 14px;border-radius:12px;font-size:14px;font-weight:700;
   border:1px solid rgba(255,255,255,0.1);color:#fff;
 }
 </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="killer-top-bar">
+  <div class="brand-box">
+    <img src="https://d13ir53smqqeyp.cloudfront.net/d11-static-pages/images/dream11LogoWhite.webp" class="brand-img">
+    <span class="pro-badge">PRO</span>
+  </div>
+
+  <span id="userName" class="user-name"></span>
+
+  <button id="walletBtn" class="wallet-btn">₹0</button>
+</div>
+
+<div class="user-box">
+  <div><b>User:</b> <span id="username">-</span></div>
+  <div><b>Balance:</b> ₹<span id="balance">0</span></div>
+</div>
+
+<div class="matches-area" id="matchContainer"></div>
+<p class="upcoming">8th Match starts in <b>3 Hours</b> ⏳</p>
+
+<!-- POPUP UI -->
+<div class="popup-overlay" id="popup">
+  <div class="popup-box">
+    <h2 id="popupTitle">Title</h2>
+    <p id="popupMsg">Message</p>
+    <button class="popup-btn" onclick="closePopup()">OK</button>
+  </div>
+</div>
 
 <script>
-(function() {
-  const walletBtn = document.getElementById("walletBtn");
-  const userName = document.getElementById("userName");
+// MATCHES
+const matches = [
+  ["Delhi (Black)", "Kolkata (Blue)"],
+  ["Mumbai (Black)", "Punjab (Blue)"],
+  ["Hyderabad (Black)", "Chennai (Blue)"],
+  ["Lucknow (Black)", "Gujarat (Blue)"],
+  ["Bangalore (Black)", "Rajasthan (Blue)"],
+  ["Goa (Black)", "Kerala (Blue)"],
+  ["Nagpur (Black)", "Pune (Blue)"],
+];
 
-  // Read hash: #username#balance
-  let hash = location.hash.replace("#", "");
-  if (hash.includes("#")) {
-    const parts = hash.split("#");
-    const u = parts[0] || "";
-    const b = parts[1] || "0";
+// POPUP
+function pop(title, msg){
+  document.getElementById("popupTitle").innerText = title;
+  document.getElementById("popupMsg").innerText = msg;
+  document.getElementById("popup").style.display = "flex";
+}
+function closePopup(){
+  document.getElementById("popup").style.display = "none";
+}
 
-    if (u) localStorage.setItem("APP_USER", u);
-    if (b && !isNaN(b)) localStorage.setItem("APP_BALANCE", b);
+// USER INIT
+function initUser(){
+  let hash = location.hash.replace("#","");
+  if(hash.includes("#")){
+    let [u,b] = hash.split("#");
+    if(u) localStorage.setItem("APP_USER",u);
+    if(b && !isNaN(b)) localStorage.setItem("APP_BALANCE",b);
+    history.replaceState(null,null,location.pathname);
+  }
+  loadUser();
+}
 
-    // Remove hash from URL
-    history.replaceState(null, "", location.pathname + location.search);
+function loadUser(){
+  const uname = localStorage.getItem("APP_USER") || "Guest";
+  const bal = Number(localStorage.getItem("APP_BALANCE") || 0);
+
+  document.getElementById("username").innerText = uname;
+  document.getElementById("balance").innerText = bal;
+  document.getElementById("userName").innerText = uname;
+  document.getElementById("walletBtn").innerText = "₹" + bal;
+}
+
+function updateBalance(amount){
+  localStorage.setItem("APP_BALANCE",amount);
+  document.getElementById("balance").innerText = amount;
+  document.getElementById("walletBtn").innerText = "₹" + amount;
+}
+
+// BET
+function bet(option){
+  let bal = Number(localStorage.getItem("APP_BALANCE") || 0);
+  if(bal < 200){
+    pop("Low Balance ⚠","You need at least ₹200. Redirecting…");
+    setTimeout(()=>location.href="/withdrawl",1500);
+    return;
   }
 
-  // Load saved values
-  const savedUser = localStorage.getItem("APP_USER") || "Guest";
-  const savedBal = localStorage.getItem("APP_BALANCE") || "0";
+  bal -= 200;
+  updateBalance(bal);
 
-  userName.textContent = savedUser;
-  walletBtn.textContent = "₹" + savedBal;
+  pop("Bet Placed 🎉",`You bet on:\n${option}\n\nNew Balance: ₹${bal}`);
 
-})();
+  let u = localStorage.getItem("APP_USER") || "Guest";
+  setTimeout(()=>location.href=`/home#${u}#${bal}`,1300);
+}
+
+// Render Matches
+function renderMatches(){
+  const box = document.getElementById("matchContainer");
+  matches.forEach(m=>{
+    let div = document.createElement("div");
+    div.className = "match-card";
+    div.innerHTML = `
+       <h3>${m[0].split(" ")[0]} vs ${m[1].split(" ")[0]}</h3>
+       <div class="btns">
+         <button class="btn black" onclick="bet('${m[0]}')">Bet 200 Black</button>
+         <button class="btn blue" onclick="bet('${m[1]}')">Bet 200 Blue</button>
+       </div>
+     `;
+    box.appendChild(div);
+  });
+}
+
+// INIT
+initUser();
+renderMatches();
 </script>
 
+</body>
+</html>
 <!-- Floating full-width bottom nav with custom "killer" SVG icons. Paste this anywhere (no <body> wrapper required). -->
 
 <nav class="killer-bottom-nav" role="navigation" aria-label="Main">
