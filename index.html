@@ -1,3 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Match Betting</title>
+
+<style>
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#0c0f17;
+  color:white;
+  padding:90px 12px 100px; /* header & footer safe gap */
+}
+
+.user-box{
+  text-align:center;
+  background:#131923;
+  padding:14px;
+  border-radius:10px;
+  margin-bottom:15px;
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.matches-area{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.match-card{
+  background:#111623;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.06);
+}
+
+.match-card h3{
+  margin:0 0 10px;
+  font-size:15px;
+  font-weight:600;
+}
+
+.btns{
+  display:flex;
+  gap:10px;
+}
+
+.btn{
+  flex:1;
+  padding:10px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:600;
+  border:0;
+  transition:0.25s;
+}
+
+.black{background:#000;border:1px solid #333;color:white;}
+.blue{background:#0048ff;border:1px solid #1c5fff;color:white;}
+
+.btn:active{transform:scale(.93);}
+.upcoming{
+  text-align:center;
+  opacity:.7;
+  margin-top:20px;
+  font-size:14px;
+}
+</style>
+</head>
+<body>
+
+<div class="user-box">
+  <div><b>User:</b> <span id="username">-</span></div>
+  <div><b>Balance:</b> ₹<span id="balance">0</span></div>
+</div>
+
+<div class="matches-area" id="matchContainer"></div>
+
+<p class="upcoming">8th Match starts in <b>3 Hours</b> ⏳</p>
+
+<script>
+// -------------------- MATCH DATA --------------------
+const matches = [
+  ["Delhi (Black)", "Kolkata (Blue)"],
+  ["Mumbai (Black)", "Punjab (Blue)"],
+  ["Hyderabad (Black)", "Chennai (Blue)"],
+  ["Lucknow (Black)", "Gujarat (Blue)"],
+  ["Bangalore (Black)", "Rajasthan (Blue)"],
+  ["Goa (Black)", "Kerala (Blue)"],
+  ["Nagpur (Black)", "Pune (Blue)"],
+];
+
+// -------------------- USER + BALANCE SETUP --------------------
+function initUserFromHash(){
+  const hash = window.location.hash.replace("#","").trim();
+  if(!hash.includes("#")) return loadFromLocal();
+
+  const [u, b] = hash.split("#");
+  if(u && b && !isNaN(b)){
+    localStorage.setItem("bet_username", u);
+    localStorage.setItem("bet_balance", Number(b));
+    removeHash();
+    loadFromLocal();
+  } else {
+    loadFromLocal();
+  }
+}
+
+function removeHash(){
+  history.replaceState("", document.title, window.location.pathname + window.location.search);
+}
+
+function loadFromLocal(){
+  const name = localStorage.getItem("bet_username") || "Guest";
+  const bal = Number(localStorage.getItem("bet_balance") || 0);
+  document.getElementById("username").textContent = name;
+  document.getElementById("balance").textContent = bal;
+}
+
+function updateBalance(amount){
+  localStorage.setItem("bet_balance", amount);
+  document.getElementById("balance").textContent = amount;
+}
+
+// -------------------- BET FUNCTION --------------------
+function placeBet(option){
+  let bal = Number(localStorage.getItem("bet_balance") || 0);
+
+  if(bal < 200){
+    alert("⚠ Insufficient Balance! Redirecting to Withdrawl");
+    return location.href = "/withdrawl";
+  }
+
+  bal -= 200;
+  updateBalance(bal);
+  alert(`🎉 Bet Placed on ${option} | New Balance: ₹${bal}`);
+  location.href = `/home#${document.getElementById("username").textContent}#${bal}`;
+}
+
+// -------------------- RENDER MATCHES --------------------
+function loadMatches(){
+  const box = document.getElementById("matchContainer");
+  matches.forEach(m => {
+    const div = document.createElement("div");
+    div.className = "match-card";
+    div.innerHTML = `
+      <h3>${m[0].split(" ")[0]} vs ${m[1].split(" ")[0]}</h3>
+      <div class="btns">
+        <button class="btn black" onclick="placeBet('${m[0]}')">Bet 200 Black</button>
+        <button class="btn blue" onclick="placeBet('${m[1]}')">Bet 200 Blue</button>
+      </div>
+    `;
+    box.appendChild(div);
+  });
+}
+
+// -------------------- INIT --------------------
+initUserFromHash();
+loadMatches();
+</script>
+
+</body>
+</html>
+
+
+
+
 <!-- Floating Top Bar -->
 <div class="killer-top-bar">
   <div class="brand-box">
