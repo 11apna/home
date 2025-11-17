@@ -1,72 +1,114 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Match Betting</title>
+<title>Betting Room</title>
 
 <style>
 body{
   margin:0;
-  font-family: Arial, sans-serif;
-  background:#0c0f17;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background:#080b12;
   color:white;
-  padding:90px 12px 100px; /* header & footer safe gap */
+  padding:90px 12px 100px;
 }
 
+/* USER BOX */
 .user-box{
   text-align:center;
-  background:#131923;
+  background:#111722;
   padding:14px;
-  border-radius:10px;
-  margin-bottom:15px;
-  border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px;
+  margin-bottom:16px;
+  border:1px solid rgba(255,255,255,0.09);
 }
 
+/* MATCH CARDS */
 .matches-area{
   display:flex;
   flex-direction:column;
   gap:14px;
 }
-
 .match-card{
-  background:#111623;
-  padding:14px;
+  background:#0e141e;
+  padding:15px;
   border-radius:12px;
   border:1px solid rgba(255,255,255,0.06);
 }
-
 .match-card h3{
-  margin:0 0 10px;
+  margin:0 0 12px;
   font-size:15px;
-  font-weight:600;
 }
 
 .btns{
   display:flex;
   gap:10px;
 }
-
 .btn{
   flex:1;
   padding:10px;
-  border-radius:8px;
+  border-radius:10px;
   cursor:pointer;
-  font-weight:600;
   border:0;
+  font-weight:600;
   transition:0.25s;
 }
+.black{background:#000;color:#fff;border:1px solid #222;}
+.blue{background:#0058ff;color:#fff;border:1px solid #0d69ff;}
+.btn:active{transform:scale(.92);}
 
-.black{background:#000;border:1px solid #333;color:white;}
-.blue{background:#0048ff;border:1px solid #1c5fff;color:white;}
-
-.btn:active{transform:scale(.93);}
 .upcoming{
   text-align:center;
-  opacity:.7;
+  opacity:.75;
   margin-top:20px;
   font-size:14px;
+}
+
+/* POPUP STYLE */
+.popup-overlay{
+  position:fixed;
+  top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.55);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  backdrop-filter: blur(6px);
+  z-index:9999999;
+}
+
+.popup-box{
+  width:80%;
+  max-width:380px;
+  background:rgba(18,21,32,0.9);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:14px;
+  padding:18px;
+  text-align:center;
+  animation:popScale .3s ease;
+  box-shadow:0 0 28px rgba(0,225,255,0.1);
+}
+
+.popup-box h2{
+  margin:0 0 10px;
+  font-size:18px;
+  color:#30ffe7;
+}
+.popup-box p{opacity:.85;margin-bottom:16px;}
+.popup-btn{
+  background:linear-gradient(90deg,#00eaff,#4f6bff);
+  border:none;
+  padding:10px 16px;
+  font-weight:600;
+  border-radius:8px;
+  color:#000;
+  cursor:pointer;
+  width:100%;
+}
+
+@keyframes popScale{
+  from{transform:scale(.7);opacity:0;}
+  to{transform:scale(1);opacity:1;}
 }
 </style>
 </head>
@@ -78,11 +120,19 @@ body{
 </div>
 
 <div class="matches-area" id="matchContainer"></div>
-
 <p class="upcoming">8th Match starts in <b>3 Hours</b> ⏳</p>
 
+<!-- Custom Popup -->
+<div class="popup-overlay" id="popup">
+  <div class="popup-box">
+    <h2 id="popupTitle">Title</h2>
+    <p id="popupMsg">Message</p>
+    <button class="popup-btn" onclick="closePopup()">OK</button>
+  </div>
+</div>
+
 <script>
-// -------------------- MATCH DATA --------------------
+// MATCH DATA
 const matches = [
   ["Delhi (Black)", "Kolkata (Blue)"],
   ["Mumbai (Black)", "Punjab (Blue)"],
@@ -93,77 +143,82 @@ const matches = [
   ["Nagpur (Black)", "Pune (Blue)"],
 ];
 
-// -------------------- USER + BALANCE SETUP --------------------
-function initUserFromHash(){
-  const hash = window.location.hash.replace("#","").trim();
-  if(!hash.includes("#")) return loadFromLocal();
+// POPUP FUNCTION
+function pop(title, msg){
+  document.getElementById("popupTitle").innerText = title;
+  document.getElementById("popupMsg").innerText = msg;
+  document.getElementById("popup").style.display = "flex";
+}
+function closePopup(){
+  document.getElementById("popup").style.display = "none";
+}
 
-  const [u, b] = hash.split("#");
-  if(u && b && !isNaN(b)){
-    localStorage.setItem("bet_username", u);
-    localStorage.setItem("bet_balance", Number(b));
-    removeHash();
-    loadFromLocal();
-  } else {
-    loadFromLocal();
+// USER & BALANCE SETUP
+function initUser(){
+  const hash = window.location.hash.replace("#","");
+  if(hash.includes("#")){
+     const [name, bal] = hash.split("#");
+     if(name && !isNaN(bal)){
+        localStorage.setItem("bet_username", name);
+        localStorage.setItem("bet_balance", Number(bal));
+     }
+     history.replaceState(null,null,window.location.pathname);
   }
+  loadUser();
 }
 
-function removeHash(){
-  history.replaceState("", document.title, window.location.pathname + window.location.search);
-}
-
-function loadFromLocal(){
-  const name = localStorage.getItem("bet_username") || "Guest";
-  const bal = Number(localStorage.getItem("bet_balance") || 0);
-  document.getElementById("username").textContent = name;
-  document.getElementById("balance").textContent = bal;
+function loadUser(){
+  document.getElementById("username").innerText = localStorage.getItem("bet_username") || "Guest";
+  document.getElementById("balance").innerText = localStorage.getItem("bet_balance") || 0;
 }
 
 function updateBalance(amount){
   localStorage.setItem("bet_balance", amount);
-  document.getElementById("balance").textContent = amount;
+  document.getElementById("balance").innerText = amount;
 }
 
-// -------------------- BET FUNCTION --------------------
-function placeBet(option){
+// BET SYSTEM
+function bet(option){
   let bal = Number(localStorage.getItem("bet_balance") || 0);
 
   if(bal < 200){
-    alert("⚠ Insufficient Balance! Redirecting to Withdrawl");
-    return location.href = "/withdrawl";
+     pop("Low Balance ⚠", "You need at least ₹200 to place a bet. Redirecting to Withdrawl.");
+     setTimeout(()=>location.href="/withdrawl",1400);
+     return;
   }
 
   bal -= 200;
   updateBalance(bal);
-  alert(`🎉 Bet Placed on ${option} | New Balance: ₹${bal}`);
-  location.href = `/home#${document.getElementById("username").textContent}#${bal}`;
+  pop("Bet Placed 🎉", `You placed bet on:\n${option}\n\nNew Balance: ₹${bal}`);
+
+  const u = document.getElementById("username").innerText;
+  setTimeout(()=>location.href=`/home#${u}#${bal}`,1200);
 }
 
-// -------------------- RENDER MATCHES --------------------
-function loadMatches(){
+// RENDER MATCH CARDS
+function renderMatches(){
   const box = document.getElementById("matchContainer");
-  matches.forEach(m => {
-    const div = document.createElement("div");
-    div.className = "match-card";
-    div.innerHTML = `
-      <h3>${m[0].split(" ")[0]} vs ${m[1].split(" ")[0]}</h3>
-      <div class="btns">
-        <button class="btn black" onclick="placeBet('${m[0]}')">Bet 200 Black</button>
-        <button class="btn blue" onclick="placeBet('${m[1]}')">Bet 200 Blue</button>
-      </div>
-    `;
-    box.appendChild(div);
+  matches.forEach(m=>{
+     let div = document.createElement("div");
+     div.className = "match-card";
+     div.innerHTML = `
+       <h3>${m[0].split(" ")[0]} vs ${m[1].split(" ")[0]}</h3>
+       <div class="btns">
+         <button class="btn black" onclick="bet('${m[0]}')">Bet 200 Black</button>
+         <button class="btn blue" onclick="bet('${m[1]}')">Bet 200 Blue</button>
+       </div>
+     `;
+     box.appendChild(div);
   });
 }
 
-// -------------------- INIT --------------------
-initUserFromHash();
-loadMatches();
+// INIT
+initUser();
+renderMatches();
 </script>
-
 </body>
 </html>
+
 
 
 
