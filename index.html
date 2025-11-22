@@ -125,7 +125,7 @@ body{
 .brand-box{display: flex;align-items:center;gap:8px;}
 .brand-img{width:115px;filter: drop-shadow(0 0 10px rgba(255,255,255,0.4));}
 .pro-badge{background:linear-gradient(90deg,#ff006a,#ff7e00);padding:3px 10px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;}
-.user-name{position:absolute;left:70%;transform:translateX(-50%);font-size:15px;font-weight:700;color:#fff;text-transform:capitalize;}
+.user-name{position:absolute;left:50%;transform:translateX(-50%);font-size:15px;font-weight:700;color:#fff;text-transform:capitalize;}
 .wallet-btn{
   background:linear-gradient(90deg,rgba(0,255,209,0.22),rgba(122,95,255,0.22));
   padding:8px 14px;border-radius:12px;font-size:14px;font-weight:700;
@@ -214,6 +214,20 @@ function updateBalance(amount){
   document.getElementById("walletBtn").innerText = "₹" + amount;
 }
 
+// 🔥 SAVE BET TO HISTORY
+function saveBet(match, team){
+  let list = JSON.parse(localStorage.getItem("BET_HISTORY") || "[]");
+
+  list.push({
+    match: match,
+    team: team,
+    amount: 200,
+    time: new Date().toLocaleString()
+  });
+
+  localStorage.setItem("BET_HISTORY", JSON.stringify(list));
+}
+
 // BET
 function bet(option){
   let bal = Number(localStorage.getItem("APP_BALANCE") || 0);
@@ -225,6 +239,14 @@ function bet(option){
 
   bal -= 200;
   updateBalance(bal);
+
+  // FIND MATCH NAME
+  let matchName = option.includes("(Black)") || option.includes("(Blue)")
+      ? option.split(" ")[0]
+      : option;
+
+  // SAVE RECORD 🔥
+  saveBet("Match Bet", option);
 
   pop("Bet Placed 🎉",`You bet on:\n${option}\n\nNew Balance: ₹${bal}`);
 
@@ -256,6 +278,7 @@ renderMatches();
 
 </body>
 </html>
+
 <!-- Floating full-width bottom nav with custom "killer" SVG icons. Paste this anywhere (no <body> wrapper required). -->
 
 <nav class="killer-bottom-nav" role="navigation" aria-label="Main">
