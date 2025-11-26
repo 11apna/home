@@ -233,7 +233,7 @@ function bet(option){
   let bal = Number(localStorage.getItem("APP_BALANCE") || 0);
   if(bal < 200){
     pop("Low Balance ⚠","You need at least ₹200. Redirecting…");
-    setTimeout(()=>location.href="/withdrawl",1500);
+    setTimeout(()=>location.href="/deposit",1500);
     return;
   }
 
